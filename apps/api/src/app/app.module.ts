@@ -26,6 +26,7 @@ import { join } from 'node:path';
 import { AccessModule } from './access/access.module';
 import { AccountModule } from './account/account.module';
 import { AdminModule } from './admin/admin.module';
+import { AgentModule } from './agent/agent.module';
 import { AppController } from './app.controller';
 import { AssetModule } from './asset/asset.module';
 import { AuthDeviceModule } from './auth-device/auth-device.module';
@@ -62,6 +63,7 @@ import { UserModule } from './user/user.module';
     AdminModule,
     AccessModule,
     AccountModule,
+    AgentModule,
     AiModule,
     ApiKeysModule,
     AssetModule,
