@@ -4,6 +4,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Healthcheck disabled so deploy can succeed; fix DB/Redis env if app doesn't respond
+healthcheckPath = "/api/v1/health/live"
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10

@@ -23,6 +23,12 @@ import { HealthService } from './health.service';
 export class HealthController {
   public constructor(private readonly healthService: HealthService) {}
 
+  /** Liveness: returns 200 as soon as the server is listening (for Railway etc.) */
+  @Get('live')
+  public getLive(@Res() response: Response) {
+    return response.status(HttpStatus.OK).json({ status: 'OK' });
+  }
+
   @Get()
   public async getHealth(@Res() response: Response) {
     const databaseServiceHealthy = await this.healthService.isDatabaseHealthy();
