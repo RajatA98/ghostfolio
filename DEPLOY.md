@@ -1,37 +1,67 @@
-# Deploy AgentForge (public MVP)
+# Deploy AgentForge (public MVP) — Railway
 
-One of these gets you a public URL so your agent can call the API.
-
----
-
-## Option A: Render (one Blueprint)
-
-1. Push this repo to GitHub.
-2. [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint**.
-3. Connect the repo; Render uses `render.yaml` at the root.
-4. Click **Deploy Blueprint**. When prompted:
-   - **REDIS_PASSWORD**: leave blank (or set if your Key Value instance uses auth).
-   - **ROOT_URL**: leave blank for now.
-5. After the first deploy, open your web service → **Environment** → set **ROOT_URL** to your service URL (e.g. `https://agentforge.onrender.com`) → **Save** (redeploys).
-6. Open `https://<your-service>.onrender.com` → create the first user (admin) → copy that user’s **security token**.
-7. Agent auth:  
-   `POST https://<your-service>.onrender.com/api/v1/auth/anonymous`  
-   Body: `{ "accessToken": "<security_token>" }`  
-   Use the returned `authToken` as `Authorization: Bearer <authToken>` on API requests.
+Use Railway to get a public URL so your agent can call the API.
 
 ---
 
-## Option B: Railway
+## Railway steps
 
-1. Push this repo to GitHub.
-2. [Railway](https://railway.app) → **New Project** → **Deploy from GitHub** → select this repo (Railway uses the root `Dockerfile` and `railway.toml`).
-3. In the same project: **+ New** → **Database** → **PostgreSQL**; then **+ New** → **Database** → **Redis**.
-4. Open your **app service** → **Variables** → add:
-   - **DATABASE_URL** (from Postgres service).
-   - **REDIS_HOST**, **REDIS_PORT**, **REDIS_PASSWORD** (from Redis service).
-   - **JWT_SECRET_KEY**, **ACCESS_TOKEN_SALT** (any long random strings).
-   - **ROOT_URL** = your public URL (e.g. `https://<your-app>.up.railway.app`) — set after **Generate Domain** in **Settings** → **Networking**.
-5. Deploy; then create the first user and use the security token for the agent as in Option A (replace the base URL with your Railway URL).
+1. **Push this repo to GitHub** (if not already).
+
+2. **Create project**  
+   [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub** → select this repo.  
+   Railway uses the root `Dockerfile` and `railway.toml`.
+
+3. **Add Postgres**  
+   In the same project: **+ New** → **Database** → **PostgreSQL**.  
+   Open the Postgres service → **Variables** (or **Connect**) → copy **`DATABASE_URL`** (or the connection URL).
+
+4. **Add Redis**  
+   **+ New** → **Database** → **Redis**.  
+   Open the Redis service → **Variables** → note **Host**, **Port**, **Password** (or the connection URL).
+
+5. **Generate public URL**  
+   Open your **app service** (the one from the repo) → **Settings** → **Networking** → **Generate Domain**.  
+   Copy the URL (e.g. `https://agentforge-production.up.railway.app`).
+
+6. **Set app env vars**  
+   App service → **Variables** → **Add variable** (or **RAW Editor**). Add:
+
+   | Variable            | Where to get it                                                           |
+   | ------------------- | ------------------------------------------------------------------------- |
+   | `DATABASE_URL`      | Postgres service → Variables / Connect                                    |
+   | `REDIS_HOST`        | Redis service → Variables (host)                                          |
+   | `REDIS_PORT`        | Redis service → Variables (port, e.g. 6379)                               |
+   | `REDIS_PASSWORD`    | Redis service → Variables (password; can leave empty if none)             |
+   | `JWT_SECRET_KEY`    | Any long random string (e.g. `openssl rand -hex 32`)                      |
+   | `ACCESS_TOKEN_SALT` | Another long random string                                                |
+   | `ROOT_URL`          | The URL from step 5 (e.g. `https://agentforge-production.up.railway.app`) |
+
+   **Tip:** For Postgres/Redis, Railway can “Reference” variables from the other services so you don’t copy-paste secrets.
+
+7. **Deploy**  
+   Save variables; Railway redeploys. Wait for the deploy to finish.
+
+8. **Create first user**  
+   Open **ROOT_URL** in a browser → **Get started** → create an account (this user is admin).
+
+9. **Get token for the agent**  
+   In the app: open that user’s **Account** / **Settings** → copy the **security token**.
+
+10. **Agent auth**
+    - `POST <ROOT_URL>/api/v1/auth/anonymous`
+    - Body: `{ "accessToken": "<security_token>" }`
+    - Use the returned **authToken** as `Authorization: Bearer <authToken>` on all API requests.
+
+---
+
+## Alternative: Render
+
+1. Push to GitHub.
+2. [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint** → connect repo (uses `render.yaml`).
+3. **Deploy Blueprint**; when prompted, leave **REDIS_PASSWORD** and **ROOT_URL** blank for now.
+4. After deploy: set **ROOT_URL** in the web service env to your Render URL → Save.
+5. Open the URL → create first user → copy security token → use `POST .../api/v1/auth/anonymous` and Bearer token as above.
 
 ---
 
@@ -39,7 +69,7 @@ One of these gets you a public URL so your agent can call the API.
 
 | Variable            | Required | Notes                                           |
 | ------------------- | -------- | ----------------------------------------------- |
-| `DATABASE_URL`      | Yes      | Postgres URL from the host.                     |
+| `DATABASE_URL`      | Yes      | Postgres connection URL.                        |
 | `REDIS_HOST`        | Yes      | Redis host.                                     |
 | `REDIS_PORT`        | Yes      | Usually `6379`.                                 |
 | `REDIS_PASSWORD`    | No\*     | Leave empty if Redis has no auth.               |
@@ -47,4 +77,4 @@ One of these gets you a public URL so your agent can call the API.
 | `ACCESS_TOKEN_SALT` | Yes      | Long random string.                             |
 | `ROOT_URL`          | Yes      | Your app’s public URL (set after first deploy). |
 
-\* App allows empty; required if your Redis has a password.
+\* App allows empty; required only if your Redis has a password.
