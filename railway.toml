@@ -1,0 +1,9 @@
+# Railway: deploy from GitHub; add Postgres + Redis in dashboard, then set env vars.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/v1/health"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
