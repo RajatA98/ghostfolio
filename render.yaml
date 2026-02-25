@@ -37,6 +37,9 @@ services:
   - type: keyvalue
     name: agentforge-redis
     plan: free
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
 
 databases:
   - name: agentforge-db
