@@ -45,6 +45,7 @@ export interface SymbolMetrics {
   totalAccountBalanceInBaseCurrency: Big;
   totalDividend: Big;
   totalDividendInBaseCurrency: Big;
+  totalDividendInBaseCurrencyTTM: Big;
   totalInterest: Big;
   totalInterestInBaseCurrency: Big;
   totalInvestment: Big;
