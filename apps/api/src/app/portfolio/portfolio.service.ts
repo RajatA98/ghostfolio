@@ -1899,6 +1899,9 @@ export class PortfolioService {
     const dividendInBaseCurrency =
       await portfolioCalculator.getDividendInBaseCurrency();
 
+    const dividendInBaseCurrencyTTM =
+      await portfolioCalculator.getDividendInBaseCurrencyTTM();
+
     const fees = await portfolioCalculator.getFeesInBaseCurrency();
     const interest = await portfolioCalculator.getInterestInBaseCurrency();
 
@@ -1990,6 +1993,11 @@ export class PortfolioService {
       committedFunds: committedFunds.toNumber(),
       currentValueInBaseCurrency: currentValueInBaseCurrency.toNumber(),
       dividendInBaseCurrency: dividendInBaseCurrency.toNumber(),
+      dividendYieldTrailingTwelveMonths: totalInvestmentWithCurrencyEffect.gt(0)
+        ? dividendInBaseCurrencyTTM
+            .div(totalInvestmentWithCurrencyEffect)
+            .toNumber()
+        : 0,
       emergencyFund: {
         assets: emergencyFundHoldingsValueInBaseCurrency,
         cash: totalEmergencyFund

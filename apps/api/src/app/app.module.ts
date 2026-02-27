@@ -36,6 +36,7 @@ import { ApiKeysModule } from './endpoints/api-keys/api-keys.module';
 import { AssetsModule } from './endpoints/assets/assets.module';
 import { BenchmarksModule } from './endpoints/benchmarks/benchmarks.module';
 import { GhostfolioModule } from './endpoints/data-providers/ghostfolio/ghostfolio.module';
+import { DividendsModule } from './endpoints/dividends/dividends.module';
 import { MarketDataModule } from './endpoints/market-data/market-data.module';
 import { PlatformsModule } from './endpoints/platforms/platforms.module';
 import { PublicModule } from './endpoints/public/public.module';
@@ -83,6 +84,7 @@ import { UserModule } from './user/user.module';
     CronModule,
     DataGatheringModule,
     DataProviderModule,
+    DividendsModule,
     EventEmitterModule.forRoot(),
     EventsModule,
     ExchangeRateModule,
