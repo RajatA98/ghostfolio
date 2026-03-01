@@ -129,7 +129,8 @@ export class AgentService {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders?.();
 
-    const nodeStream = Readable.fromWeb(agentRes.body as ReadableStream);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nodeStream = Readable.fromWeb(agentRes.body as any);
     nodeStream.pipe(res);
   }
 
