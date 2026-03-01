@@ -91,6 +91,10 @@ export class HtmlTemplateMiddleware implements NestMiddleware {
   private indexHtmlMap: { [languageCode: string]: string } = {};
 
   public constructor(private readonly i18nService: I18nService) {
+    // Only load client HTML in production; in dev the client is served separately
+    if (!environment.production) {
+      return;
+    }
     try {
       this.indexHtmlMap = SUPPORTED_LANGUAGE_CODES.reduce(
         (map, languageCode) => ({

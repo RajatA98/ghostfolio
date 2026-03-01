@@ -38,6 +38,17 @@ Run `npm run start:client` and open https://localhost:4200/en in your browser.
 
 To start the client in a different language, such as German (`de`), adapt the `start:client` script in the `package.json` file by changing `--configuration=development-en` to `--configuration=development-de`. Then, run `npm run start:client` and open https://localhost:4200/de in your browser.
 
+### Start Agent (optional)
+
+To use the **Agent** tab (AI assistant), run the agent service in addition to the API and client:
+
+1. Ensure the API is running (`npm run start:server`) and listening on port 3333.
+2. In a separate terminal, from the repo root: `cd apps/agent && npm run dev`  
+   The agent will listen on port 3334. Ghostfolio’s API proxies agent requests using `AGENT_SERVICE_URL` in the root `.env` (default `http://localhost:3334`).
+3. Start the client as above and open the **Agent** tab after logging in.
+
+Ensure `apps/agent/.env` exists (copy from the agent repo or use the same keys as the root `.env` for `GHOSTFOLIO_API_URL`, `ANTHROPIC_API_KEY`, etc.) and that `AGENT_AUTH_MODE=ghostfolio_shared` for shared Ghostfolio auth.
+
 ### Start _Storybook_
 
 Run `npm run start:storybook`

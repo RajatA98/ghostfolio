@@ -1,12 +1,10 @@
 import { ConfigurationService } from '@ghostfolio/api/services/configuration/configuration.service';
 import { PrismaService } from '@ghostfolio/api/services/prisma/prisma.service';
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DividendService {
-  private readonly logger = new Logger(DividendService.name);
-
   public constructor(
     private readonly configurationService: ConfigurationService,
     private readonly prismaService: PrismaService
