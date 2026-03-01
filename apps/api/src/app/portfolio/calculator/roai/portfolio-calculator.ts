@@ -2,7 +2,7 @@ import { PortfolioCalculator } from '@ghostfolio/api/app/portfolio/calculator/po
 import { PortfolioOrderItem } from '@ghostfolio/api/app/portfolio/interfaces/portfolio-order-item.interface';
 import { getFactor } from '@ghostfolio/api/helper/portfolio.helper';
 import { getIntervalFromDateRange } from '@ghostfolio/common/calculation-helper';
-import { DATE_FORMAT } from '@ghostfolio/common/helper';
+import { DATE_FORMAT, parseDate } from '@ghostfolio/common/helper';
 import {
   AssetProfileIdentifier,
   SymbolMetrics
@@ -19,7 +19,9 @@ import {
   eachYearOfInterval,
   format,
   isBefore,
-  isThisYear
+  isThisYear,
+  isWithinInterval,
+  subYears
 } from 'date-fns';
 import { cloneDeep, sortBy } from 'lodash';
 
@@ -179,6 +181,7 @@ export class RoaiPortfolioCalculator extends PortfolioCalculator {
     const totalAccountBalanceInBaseCurrency = new Big(0);
     let totalDividend = new Big(0);
     let totalDividendInBaseCurrency = new Big(0);
+    let totalDividendInBaseCurrencyTTM = new Big(0);
     let totalInterest = new Big(0);
     let totalInterestInBaseCurrency = new Big(0);
     let totalInvestment = new Big(0);
@@ -229,6 +232,7 @@ export class RoaiPortfolioCalculator extends PortfolioCalculator {
         totalAccountBalanceInBaseCurrency: new Big(0),
         totalDividend: new Big(0),
         totalDividendInBaseCurrency: new Big(0),
+        totalDividendInBaseCurrencyTTM: new Big(0),
         totalInterest: new Big(0),
         totalInterestInBaseCurrency: new Big(0),
         totalInvestment: new Big(0),
@@ -292,6 +296,7 @@ export class RoaiPortfolioCalculator extends PortfolioCalculator {
         totalAccountBalanceInBaseCurrency: new Big(0),
         totalDividend: new Big(0),
         totalDividendInBaseCurrency: new Big(0),
+        totalDividendInBaseCurrencyTTM: new Big(0),
         totalInterest: new Big(0),
         totalInterestInBaseCurrency: new Big(0),
         totalInvestment: new Big(0),
@@ -430,6 +435,19 @@ export class RoaiPortfolioCalculator extends PortfolioCalculator {
         totalDividendInBaseCurrency = totalDividendInBaseCurrency.plus(
           dividend.mul(exchangeRateAtOrderDate ?? 1)
         );
+
+        const orderDate = parseDate(order.date);
+
+        if (
+          isWithinInterval(orderDate, {
+            start: subYears(end, 1),
+            end
+          })
+        ) {
+          totalDividendInBaseCurrencyTTM = totalDividendInBaseCurrencyTTM.plus(
+            dividend.mul(exchangeRateAtOrderDate ?? 1)
+          );
+        }
       } else if (order.type === 'INTEREST') {
         const interest = order.quantity.mul(order.unitPrice);
 
@@ -989,6 +1007,7 @@ export class RoaiPortfolioCalculator extends PortfolioCalculator {
       totalAccountBalanceInBaseCurrency,
       totalDividend,
       totalDividendInBaseCurrency,
+      totalDividendInBaseCurrencyTTM,
       totalInterest,
       totalInterestInBaseCurrency,
       totalInvestment,

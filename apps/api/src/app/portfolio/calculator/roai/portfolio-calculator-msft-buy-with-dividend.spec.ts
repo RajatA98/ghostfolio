@@ -79,7 +79,7 @@ describe('PortfolioCalculator', () => {
   });
 
   describe('get current positions', () => {
-    it.only('with MSFT buy', async () => {
+    it('with MSFT buy', async () => {
       jest.useFakeTimers().setSystemTime(parseDate('2023-07-10').getTime());
 
       const activities: Activity[] = [
@@ -138,6 +138,7 @@ describe('PortfolioCalculator', () => {
             dateOfFirstActivity: '2021-09-16',
             dividend: new Big('0.62'),
             dividendInBaseCurrency: new Big('0.62'),
+            dividendInBaseCurrencyTTM: new Big('0'),
             fee: new Big('19'),
             grossPerformance: new Big('33.25'),
             grossPerformancePercentage: new Big('0.11136043941322258691'),

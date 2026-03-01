@@ -1,0 +1,151 @@
+<mat-card class="agent-shell terminal-theme">
+  <mat-card-header class="terminal-header">
+    <mat-card-title class="terminal-brand" i18n>Agent</mat-card-title>
+    <mat-card-subtitle class="terminal-subtitle" i18n
+      >Ask portfolio questions using your current Ghostfolio
+      session.</mat-card-subtitle
+    >
+  </mat-card-header>
+
+  <mat-card-content class="agent-content">
+    <div #messagesContainer class="messages" role="log">
+      @if (messages.length === 0) {
+        <div class="empty-state" i18n>
+          Would you like me to buy stocks or crypto for you?
+        </div>
+      }
+
+      @for (entry of messages; track trackByIndex($index)) {
+        <div
+          class="message-row"
+          [ngClass]="{
+            assistant: entry.role === 'assistant',
+            user: entry.role === 'user'
+          }"
+        >
+          <div class="message-bubble">
+            <div class="message-text">
+              <markdown
+                class="message-markdown"
+                [data]="entry.content ?? ''"
+              ></markdown>
+            </div>
+            @if (entry.role === 'assistant' && entry.confidence !== undefined) {
+              <div class="meta-row">
+                {{ entry.confidence * 100 | number: '1.0-0' }}% confidence
+              </div>
+            }
+            @if (
+              entry.role === 'assistant' && getDisplayWarnings(entry).length > 0
+            ) {
+              <div class="meta-row warning">
+                {{ getDisplayWarnings(entry).join(' | ') }}
+              </div>
+            }
+            @if (
+              entry.role === 'assistant' && (entry.toolTrace?.length ?? 0) > 0
+            ) {
+              <div class="meta-row tool-trace">
+                <span class="tool-trace-label" i18n>Tools</span>
+                @for (
+                  tool of getToolStatuses(entry);
+                  track trackByIndex($index)
+                ) {
+                  <span
+                    class="tool-pill"
+                    [ngClass]="{ ok: tool.ok, fail: !tool.ok }"
+                  >
+                    {{ tool.tool }} {{ tool.ok ? 'ok' : 'failed' }}
+                  </span>
+                }
+              </div>
+            }
+            @if (entry.role === 'assistant' && entry.loopMeta) {
+              <div class="meta-row metrics-row">
+                {{ getMetricsText(entry.loopMeta) }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (streamLogLines.length > 0) {
+        <div class="message-row assistant stream-console">
+          <div class="stream-bubble">
+            <div class="stream-header">[AGENT]</div>
+            <div class="stream-lines">
+              @for (line of streamLogLines; track trackByIndex($index)) {
+                <div class="stream-line" [ngClass]="line.cssClass">
+                  {{ line.text }}
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if (streamingAnswer.length > 0) {
+        <div class="message-row assistant streaming-answer">
+          <div class="message-bubble">
+            <div class="message-text">
+              <span class="streaming-text">{{
+                streamingAnswer.slice(0, streamingAnswerVisibleLength)
+              }}</span>
+              @if (streamingAnswerVisibleLength < streamingAnswer.length) {
+                <span aria-hidden="true" class="typewriter-cursor"></span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      <div #scrollAnchor aria-hidden="true" class="scroll-anchor"></div>
+    </div>
+
+    <div class="composer terminal-composer">
+      <span aria-hidden="true" class="prompt-char">&gt;</span>
+      <mat-form-field appearance="outline" class="composer-input">
+        <input
+          i18n-placeholder
+          matInput
+          placeholder="Type your question..."
+          [(ngModel)]="draftMessage"
+          (keyup.enter)="sendMessage()"
+        />
+      </mat-form-field>
+
+      @if (isSending && hasDraftMessage) {
+        <button
+          class="queue-btn terminal-queue"
+          i18n
+          type="button"
+          (click)="sendMessage()"
+        >
+          Queue
+        </button>
+        <button
+          class="queue-btn terminal-interject"
+          i18n
+          type="button"
+          (click)="interjectMessage()"
+        >
+          Interject
+        </button>
+      }
+
+      <button
+        class="send-btn terminal-send"
+        type="button"
+        [disabled]="!isSending && !hasDraftMessage"
+        [ngClass]="{ stop: isSending }"
+        (click)="isSending ? cancelMessage() : sendMessage()"
+      >
+        <span aria-hidden="true" class="send-glyph">{{
+          isSending ? '■' : '>'
+        }}</span>
+      </button>
+    </div>
+
+    @if (queueCount > 0) {
+      <div class="queue-meta" i18n>{{ queueCount }} queued</div>
+    }
+  </mat-card-content>
+</mat-card>

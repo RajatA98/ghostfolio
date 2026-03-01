@@ -1,12 +1,14 @@
-# Railway deployment configuration for Ghostfolio
+# Railway deployment configuration for Ghostfolio + Agent (single container)
 #
-# Branch strategy:
-#   - Ghostfolio (this repo):   deploy from "main" branch
-#   - ghostfolio-agent submodule: uses "ghostfolio-main" branch
+# The Dockerfile builds both Ghostfolio and the agent.
+# The entrypoint starts the agent on port 3334 (internal) and
+# Ghostfolio on the public PORT. Ghostfolio proxies /api/agent
+# requests to the agent.
 #
 # Required environment variables (set in Railway dashboard):
 #   DATABASE_URL, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD,
-#   JWT_SECRET_KEY, ACCESS_TOKEN_SALT, ROOT_URL
+#   JWT_SECRET_KEY, ACCESS_TOKEN_SALT, ROOT_URL,
+#   ANTHROPIC_API_KEY, AGENT_MODEL
 
 [build]
 builder = "DOCKERFILE"

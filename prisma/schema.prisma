@@ -263,13 +263,14 @@ model User {
   accessesGive  Access[]        @relation("accessGive")
   accessToken   String?
   accounts      Account[]
-  activities    Order[]
-  analytics     Analytics?
-  apiKeys       ApiKey[]
+  activities      Order[]
+  analytics       Analytics?
+  apiKeys         ApiKey[]
   authChallenge String?
   authDevices   AuthDevice[]
-  createdAt     DateTime        @default(now())
-  id            String          @id @default(uuid())
+  createdAt       DateTime        @default(now())
+  dividendRecords DividendRecord[]
+  id              String          @id @default(uuid())
   provider      Provider        @default(ANONYMOUS)
   role          Role            @default(USER)
   settings      Settings?
@@ -285,6 +286,23 @@ model User {
   @@index([provider])
   @@index([role])
   @@index([thirdPartyId])
+}
+
+model DividendRecord {
+  id          String    @id @default(uuid())
+  userId      String
+  symbol      String
+  exDate      DateTime
+  paymentDate DateTime?
+  amount      Float
+  currency    String    @default("USD")
+  source      String    @default("FMP")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], onDelete: Cascade, references: [id])
+
+  @@index([userId, symbol])
+  @@index([userId])
 }
 
 enum AccessPermission {

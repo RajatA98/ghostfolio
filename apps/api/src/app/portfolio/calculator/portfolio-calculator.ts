@@ -370,6 +370,7 @@ export abstract class PortfolioCalculator {
         timeWeightedInvestmentWithCurrencyEffect,
         totalDividend,
         totalDividendInBaseCurrency,
+        totalDividendInBaseCurrencyTTM,
         totalInterestInBaseCurrency,
         totalInvestment,
         totalInvestmentWithCurrencyEffect,
@@ -415,6 +416,7 @@ export abstract class PortfolioCalculator {
         dateOfFirstActivity: item.dateOfFirstActivity,
         dividend: totalDividend,
         dividendInBaseCurrency: totalDividendInBaseCurrency,
+        dividendInBaseCurrencyTTM: totalDividendInBaseCurrencyTTM,
         fee: item.fee,
         feeInBaseCurrency: item.feeInBaseCurrency,
         grossPerformance: !hasErrors ? (grossPerformance ?? null) : null,
@@ -654,6 +656,16 @@ export abstract class PortfolioCalculator {
     return getSum(
       this.snapshot.positions.map(({ dividendInBaseCurrency }) => {
         return dividendInBaseCurrency;
+      })
+    );
+  }
+
+  public async getDividendInBaseCurrencyTTM() {
+    await this.snapshotPromise;
+
+    return getSum(
+      this.snapshot.positions.map(({ dividendInBaseCurrencyTTM }) => {
+        return dividendInBaseCurrencyTTM ?? new Big(0);
       })
     );
   }

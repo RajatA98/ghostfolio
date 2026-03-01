@@ -381,4 +381,21 @@
       />
     </div>
   </div>
+  <div class="flex-nowrap px-3 py-1 row">
+    <div class="flex-grow-1 text-truncate">
+      <ng-container i18n>Dividend Yield</ng-container>
+      (<ng-container i18n>Trailing Twelve Months</ng-container>)
+    </div>
+    <div class="flex-column flex-wrap justify-content-end">
+      <gf-value
+        class="justify-content-end"
+        position="end"
+        [isPercent]="true"
+        [locale]="locale"
+        [value]="
+          isLoading ? undefined : summary?.dividendYieldTrailingTwelveMonths
+        "
+      />
+    </div>
+  </div>
 </div>

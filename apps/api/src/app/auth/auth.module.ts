@@ -37,7 +37,19 @@ import { OidcStrategy } from './oidc.strategy';
     ApiKeyStrategy,
     AuthDeviceService,
     AuthService,
-    GoogleStrategy,
+    {
+      inject: [AuthService, ConfigurationService],
+      provide: GoogleStrategy,
+      useFactory: (
+        authService: AuthService,
+        configurationService: ConfigurationService
+      ) => {
+        if (!configurationService.get('ENABLE_FEATURE_AUTH_GOOGLE')) {
+          return null;
+        }
+        return new GoogleStrategy(authService, configurationService);
+      }
+    },
     JwtStrategy,
     {
       inject: [AuthService, ConfigurationService],

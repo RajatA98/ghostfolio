@@ -80,6 +80,56 @@ import { cloneDeep, groupBy, isNumber } from 'lodash';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+interface AgentChatHistoryItem {
+  content: string;
+  role: 'assistant' | 'user';
+}
+
+/** Structured portfolio data returned by the agent (e.g. snapshot). */
+export interface AgentChatResponseData {
+  valuationMethod?: string;
+  asOf?: string | null;
+  totalValue?: { currency: string; amount: number };
+  allocationBySymbol?: {
+    key: string;
+    value: { currency: string; amount: number };
+    percent: number;
+  }[];
+  allocationByAssetClass?: {
+    key: string;
+    value: { currency: string; amount: number };
+    percent: number;
+  }[];
+}
+
+export interface AgentToolTraceRow {
+  error?: string | null;
+  ms: number;
+  ok: boolean;
+  tool: string;
+}
+
+export interface AgentLoopMeta {
+  iterations: number;
+  totalMs: number;
+  tokenUsage?: {
+    inputTokens?: number;
+    outputTokens?: number;
+    totalTokens?: number;
+  };
+  terminationReason?: string;
+}
+
+export interface AgentChatResponse {
+  answer: string;
+  confidence: number;
+  /** When the agent returns portfolio/snapshot data, it is included here as JSON-serializable object. */
+  data?: AgentChatResponseData;
+  loopMeta?: AgentLoopMeta;
+  toolTrace?: AgentToolTraceRow[];
+  warnings: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -763,6 +813,13 @@ export class DataService {
 
   public postApiKey() {
     return this.http.post<ApiKeyResponse>('/api/v1/api-keys', {});
+  }
+
+  public postAgentChat(body: {
+    conversationHistory?: AgentChatHistoryItem[];
+    message: string;
+  }) {
+    return this.http.post<AgentChatResponse>('/api/v1/agent/chat', body);
   }
 
   public postBenchmark(benchmark: AssetProfileIdentifier) {
