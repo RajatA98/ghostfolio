@@ -36,8 +36,11 @@ RUN npm run build:production
 # ─── Build the agent ──────────────────────────────────────────────────
 # The agent lives under apps/agent as a git submodule.
 # If it wasn't initialized in the build context, clone it.
+# AGENT_CACHE_BUST: set to any unique value (e.g. commit SHA or timestamp)
+# to force Docker to re-clone the agent repo instead of using a cached layer.
+ARG AGENT_CACHE_BUST=1
 RUN if [ ! -f apps/agent/package.json ]; then \
-      echo "Agent submodule not initialized, cloning..."; \
+      echo "Agent submodule not initialized, cloning (bust=$AGENT_CACHE_BUST)..."; \
       rm -rf apps/agent; \
       git clone --branch ghostfolio-main --depth 1 \
         https://github.com/RajatA98/ghostfolio-agent.git apps/agent; \
